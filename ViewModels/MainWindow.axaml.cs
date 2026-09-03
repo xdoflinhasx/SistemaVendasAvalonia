@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data.Common;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -153,7 +154,8 @@ public partial class JanelaPrincipal : Window
         try
         {
             await using var banco = new VendasDbContext();
-            await banco.Database.EnsureCreatedAsync();
+            await PrepararBancoCriadoComEnsureCreatedAsync(banco);
+            await banco.Database.MigrateAsync();
             await RecarregarVendasAsync(banco);
 
             return true;
@@ -163,6 +165,34 @@ public partial class JanelaPrincipal : Window
             MensagemStatus.Text = $"Não foi possível conectar ao banco: {exception.Message}";
             return false;
         }
+    }
+
+    private static async Task PrepararBancoCriadoComEnsureCreatedAsync(VendasDbContext banco)
+    {
+        var conexao = banco.Database.GetDbConnection();
+        await banco.Database.OpenConnectionAsync();
+
+        await using var comando = conexao.CreateCommand();
+        comando.CommandText = """
+            IF OBJECT_ID(N'ItensVenda', N'U') IS NOT NULL
+               AND OBJECT_ID(N'__EFMigrationsHistory', N'U') IS NULL
+            BEGIN
+                CREATE TABLE [__EFMigrationsHistory]
+                (
+                    [MigrationId] nvarchar(150) NOT NULL,
+                    [ProductVersion] nvarchar(32) NOT NULL,
+                    CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
+                );
+
+                INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+                VALUES (N'20260903224328_InitialCreate', N'10.0.11');
+
+                IF COL_LENGTH(N'ItensVenda', N'Atualizado') IS NOT NULL
+                    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+                    VALUES (N'20260903225444_AddAtualizadoToItemVenda', N'10.0.11');
+            END
+            """;
+        await comando.ExecuteNonQueryAsync();
     }
 
     private async Task RecarregarVendasAsync(VendasDbContext banco)
