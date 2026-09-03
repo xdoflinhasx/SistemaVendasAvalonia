@@ -10,6 +10,7 @@ public sealed class ItemVenda : INotifyPropertyChanged
     public string Nome { get; private set; } = string.Empty;
     public decimal Preco { get; private set; }
     public int Quantidade { get; private set; }
+    public bool Atualizado { get; private set; }
     public string TextoPreco => Preco.ToString("C2", CultureInfo.CurrentCulture);
     public decimal Total => Preco * Quantidade;
 
