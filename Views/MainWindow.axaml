@@ -145,11 +145,11 @@
                     <Border Background="White" CornerRadius="6" BorderBrush="#DCE5EA" BorderThickness="1">
                         <StackPanel>
                             <Border Background="#EAF0F3" Padding="16,12">
-                                <Grid ColumnDefinitions="1.1*,2.2*,1.2*,1.1*,Auto">
+                                <Grid ColumnDefinitions="1.1*,2.2*,1.2*,1.1*,180">
                                     <TextBlock Text="CÓDIGO" FontSize="12" FontWeight="Bold" Foreground="#53677A" />
                                     <TextBlock Grid.Column="1" Text="PRODUTO" FontSize="12" FontWeight="Bold" Foreground="#53677A" />
-                                    <TextBlock Grid.Column="2" Text="PREÇO" FontSize="12" FontWeight="Bold" Foreground="#53677A" />
-                                    <TextBlock Grid.Column="3" Text="QUANTIDADE" FontSize="12" FontWeight="Bold" Foreground="#53677A" />
+                                    <TextBlock Grid.Column="2" Text="PREÇO" FontSize="12" FontWeight="Bold" Foreground="#53677A" HorizontalAlignment="Right" />
+                                    <TextBlock Grid.Column="3" Text="QUANTIDADE" FontSize="12" FontWeight="Bold" Foreground="#53677A" HorizontalAlignment="Right" />
                                     <TextBlock Grid.Column="4" Text="AÇÕES" FontSize="12" FontWeight="Bold" Foreground="#53677A" />
                                 </Grid>
                             </Border>
@@ -157,11 +157,11 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate x:DataType="local:ItemVenda">
                                         <Border Classes="item-row" BorderBrush="#E5ECEF" BorderThickness="0,0,0,1" Padding="16,14">
-                                            <Grid ColumnDefinitions="1.1*,2.2*,1.2*,1.1*,Auto">
+                                            <Grid ColumnDefinitions="1.1*,2.2*,1.2*,1.1*,180">
                                                 <TextBlock Text="{Binding Codigo}" Foreground="#17324D" VerticalAlignment="Center" />
                                                 <TextBlock Grid.Column="1" Text="{Binding Nome}" Foreground="#17324D" VerticalAlignment="Center" />
-                                                <TextBlock Grid.Column="2" Text="{Binding TextoPreco}" Foreground="#17324D" VerticalAlignment="Center" />
-                                                <TextBlock Grid.Column="3" Text="{Binding Quantidade}" Foreground="#17324D" VerticalAlignment="Center" />
+                                                <TextBlock Grid.Column="2" Text="{Binding TextoPreco}" Foreground="#17324D" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                                                <TextBlock Grid.Column="3" Text="{Binding Quantidade}" Foreground="#17324D" VerticalAlignment="Center" HorizontalAlignment="Right" />
                                                 <Border Grid.Column="4" Classes="acao-menu" IsVisible="True" Opacity="1" HorizontalAlignment="Right" Background="#F3F6F9" CornerRadius="8" Padding="6,4">
                                                     <StackPanel Orientation="Horizontal" Spacing="6">
                                                         <Button Content="Editar" Classes="botao-link" Tag="{Binding}" Click="EditarBotao_Clicado" />

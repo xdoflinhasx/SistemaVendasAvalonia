@@ -69,9 +69,7 @@ public partial class JanelaPrincipal : Window
             await banco.ItensVenda.AddAsync(item);
         }
         await banco.SaveChangesAsync();
-
-        if (itemEditado is not null)
-            Vendas[indiceEdicao] = itemEditado;
+        await RecarregarVendasAsync(banco);
 
         MensagemListaVazia.IsVisible = false;
         MensagemStatus.Text = string.Empty;
@@ -156,10 +154,7 @@ public partial class JanelaPrincipal : Window
         {
             await using var banco = new VendasDbContext();
             await banco.Database.EnsureCreatedAsync();
-
-            var itens = await banco.ItensVenda.AsNoTracking().OrderBy(item => item.Id).ToListAsync();
-            foreach (var item in itens)
-                Vendas.Add(item);
+            await RecarregarVendasAsync(banco);
 
             return true;
         }
@@ -168,6 +163,14 @@ public partial class JanelaPrincipal : Window
             MensagemStatus.Text = $"Não foi possível conectar ao banco: {exception.Message}";
             return false;
         }
+    }
+
+    private async Task RecarregarVendasAsync(VendasDbContext banco)
+    {
+        var itens = await banco.ItensVenda.AsNoTracking().OrderBy(item => item.Id).ToListAsync();
+        Vendas.Clear();
+        foreach (var item in itens)
+            Vendas.Add(item);
     }
 
     private void NotificarAlteracao(string nomePropriedade) =>
