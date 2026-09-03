@@ -3,9 +3,11 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
+using Microsoft.EntityFrameworkCore;
 
 namespace MeuAppAvalonia;
 
@@ -16,6 +18,7 @@ public partial class JanelaPrincipal : Window
     public bool ListaVazia => Vendas.Count == 0;
     private int _indiceEdicao = -1;
     private readonly DispatcherTimer _temporizadorMensagem = new() { Interval = TimeSpan.FromSeconds(2) };
+    private readonly Task _inicializacaoBanco;
 
     public JanelaPrincipal()
     {
@@ -28,10 +31,11 @@ public partial class JanelaPrincipal : Window
             MensagemStatus.Text = string.Empty;
             _temporizadorMensagem.Stop();
         };
+        _inicializacaoBanco = InicializarBancoAsync();
         AtualizarTotais();
     }
 
-    private void SalvarBotao_Clicado(object? sender, RoutedEventArgs e)
+    private async void SalvarBotao_Clicado(object? sender, RoutedEventArgs e)
     {
         var codigo = CodigoProdutoCaixa.Text?.Trim() ?? string.Empty;
         var nome = NomeProdutoCaixa.Text?.Trim() ?? string.Empty;
@@ -46,15 +50,22 @@ public partial class JanelaPrincipal : Window
             return;
         }
 
-        var item = new ItemVenda(codigo, nome, preco, quantidade);
+        await _inicializacaoBanco;
+
+        await using var banco = new VendasDbContext();
         if (_indiceEdicao >= 0)
         {
-            Vendas[_indiceEdicao] = item;
+            var item = Vendas[_indiceEdicao];
+            item.Atualizar(codigo, nome, preco, quantidade);
+            banco.ItensVenda.Update(item);
         }
         else
         {
+            var item = new ItemVenda(codigo, nome, preco, quantidade);
             Vendas.Add(item);
+            await banco.ItensVenda.AddAsync(item);
         }
+        await banco.SaveChangesAsync();
 
         MensagemListaVazia.IsVisible = false;
         MensagemStatus.Text = string.Empty;
@@ -82,11 +93,16 @@ public partial class JanelaPrincipal : Window
         CodigoProdutoCaixa.Focus();
     }
 
-    private void ExcluirBotao_Clicado(object? sender, RoutedEventArgs e)
+    private async void ExcluirBotao_Clicado(object? sender, RoutedEventArgs e)
     {
         if (sender is not Button { Tag: ItemVenda item })
             return;
 
+        await _inicializacaoBanco;
+
+        await using var banco = new VendasDbContext();
+        banco.ItensVenda.Remove(item);
+        await banco.SaveChangesAsync();
         Vendas.Remove(item);
         MensagemListaVazia.IsVisible = Vendas.Count == 0;
         if (_indiceEdicao >= 0)
@@ -125,6 +141,23 @@ public partial class JanelaPrincipal : Window
         NomeProdutoCaixa.Text = string.Empty;
         PrecoCaixa.Text = string.Empty;
         QuantidadeCaixa.Text = string.Empty;
+    }
+
+    private async Task InicializarBancoAsync()
+    {
+        try
+        {
+            await using var banco = new VendasDbContext();
+            await banco.Database.EnsureCreatedAsync();
+
+            var itens = await banco.ItensVenda.AsNoTracking().OrderBy(item => item.Id).ToListAsync();
+            foreach (var item in itens)
+                Vendas.Add(item);
+        }
+        catch (Exception exception)
+        {
+            MensagemStatus.Text = $"Não foi possível conectar ao banco: {exception.Message}";
+        }
     }
 
     private void NotificarAlteracao(string nomePropriedade) =>
