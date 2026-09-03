@@ -1,0 +1,201 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="using:MeuAppAvalonia"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="680"
+        x:Class="MeuAppAvalonia.JanelaPrincipal"
+        x:DataType="local:JanelaPrincipal"
+        Title="Vendas | MeuAppAvalonia"
+        MinWidth="720" MinHeight="520">
+    <Window.Styles>
+        <Style Selector="TextBlock.titulo-secao">
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="#17324D" />
+        </Style>
+        <Style Selector="TextBlock.rotulo-campo">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="#53677A" />
+            <Setter Property="Margin" Value="0,0,0,6" />
+        </Style>
+        <Style Selector="TextBox">
+            <Setter Property="MinHeight" Value="40" />
+            <Setter Property="Padding" Value="12,8" />
+        </Style>
+
+<!-- BOTÃO SALVAR -->
+<Style Selector="Button.botao-salvar">
+    <Setter Property="Background" Value="#13795B" />
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="BorderBrush" Value="#13795B" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Padding" Value="24,10" />
+    <Setter Property="MinHeight" Value="40" />
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="FontSize" Value="15" />
+</Style>
+<!-- Mantém a cor no hover/clique -->
+<Style Selector="Button.botao-salvar:pointerover /template/ ContentPresenter#PART_ContentPresenter,
+               Button.botao-salvar:pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="#13795B" />
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="BorderBrush" Value="#13795B" />
+</Style>
+
+
+<!-- BOTÃO LINK -->
+<Style Selector="Button.botao-link">
+    <Setter Property="Background" Value="#1769AA" />
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="BorderBrush" Value="#1769AA" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Padding" Value="8,6" />
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="Transitions" Value="{x:Null}" />
+</Style>
+<!-- Mantém a cor no hover/clique -->
+<Style Selector="Button.botao-link:pointerover /template/ ContentPresenter#PART_ContentPresenter,
+               Button.botao-link:pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="#1769AA" />
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="BorderBrush" Value="#1769AA" />
+</Style>
+
+
+<!-- BOTÃO EXCLUIR -->
+<Style Selector="Button.botao-excluir">
+    <Setter Property="Background" Value="#B42318" />
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="BorderBrush" Value="#B42318" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Padding" Value="8,6" />
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="Transitions" Value="{x:Null}" />
+</Style>
+<!-- Mantém a cor no hover/clique -->
+<Style Selector="Button.botao-excluir:pointerover /template/ ContentPresenter#PART_ContentPresenter,
+               Button.botao-excluir:pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="#B42318" />
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="BorderBrush" Value="#B42318" />
+</Style>
+
+
+<!-- BORDER ACAO-MENU (Já não possui efeito hover nativo no Avalonia) -->
+<Style Selector="Border.acao-menu">
+    <Setter Property="Background" Value="#F3F6F9" />
+    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="Padding" Value="6,4" />
+    <Setter Property="Opacity" Value="1" />
+    <Setter Property="IsVisible" Value="True" />
+    <Setter Property="HorizontalAlignment" Value="Right" />
+</Style>
+    </Window.Styles>
+
+    <Grid RowDefinitions="Auto,*" Background="#F4F7F9">
+        <Border Grid.Row="0" Background="#17324D" Padding="32,26">
+            <StackPanel Spacing="5">
+                <TextBlock Text="VENDAS" FontSize="12" FontWeight="Bold" Foreground="#7BDCB5" />
+                <TextBlock Text="Registrar venda" FontSize="30" FontWeight="SemiBold" Foreground="White" />
+                <TextBlock Text="Cadastre os produtos vendidos e acompanhe os itens nesta tela." Foreground="#D7E5ED" />
+            </StackPanel>
+        </Border>
+
+        <ScrollViewer Grid.Row="1" Padding="32,28">
+            <StackPanel Spacing="24" MaxWidth="1100" HorizontalAlignment="Stretch">
+                <Border Background="White" CornerRadius="6" Padding="24" BorderBrush="#DCE5EA" BorderThickness="1">
+                    <StackPanel Spacing="18">
+                                        <TextBlock Text="Dados do produto" Classes="titulo-secao" />
+                        <Grid ColumnDefinitions="1.1*,2.2*,1.2*,1.1*" ColumnSpacing="16">
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Código do produto" Classes="rotulo-campo" />
+                                <TextBox x:Name="CodigoProdutoCaixa" PlaceholderText="Ex.: 00125" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="Nome do produto" Classes="rotulo-campo" />
+                                <TextBox x:Name="NomeProdutoCaixa" PlaceholderText="Digite o nome do produto" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Preço" Classes="rotulo-campo" />
+                                <TextBox x:Name="PrecoCaixa" PlaceholderText="Ex.: 29,90" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="3">
+                                <TextBlock Text="Quantidade" Classes="rotulo-campo" />
+                                <TextBox x:Name="QuantidadeCaixa" PlaceholderText="Ex.: 1" />
+                            </StackPanel>
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                            <TextBlock x:Name="MensagemStatus" VerticalAlignment="Center" Foreground="#B42318" />
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
+                                <Button x:Name="CancelarEdicaoBotao" Content="Cancelar" IsVisible="False" Click="CancelarEdicaoBotao_Clicado" />
+                                <Button x:Name="SalvarBotao" Content="Salvar" Classes="botao-salvar" Click="SalvarBotao_Clicado" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <StackPanel Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="Produtos da venda" Classes="titulo-secao" />
+                        <TextBlock Grid.Column="1" Text="Itens adicionados" Foreground="#6C7D89" VerticalAlignment="Center" />
+                    </Grid>
+                    <Border Background="White" CornerRadius="6" BorderBrush="#DCE5EA" BorderThickness="1">
+                        <StackPanel>
+                            <Border Background="#EAF0F3" Padding="16,12">
+                                <Grid ColumnDefinitions="1.1*,2.2*,1.2*,1.1*,Auto">
+                                    <TextBlock Text="CÓDIGO" FontSize="12" FontWeight="Bold" Foreground="#53677A" />
+                                    <TextBlock Grid.Column="1" Text="PRODUTO" FontSize="12" FontWeight="Bold" Foreground="#53677A" />
+                                    <TextBlock Grid.Column="2" Text="PREÇO" FontSize="12" FontWeight="Bold" Foreground="#53677A" />
+                                    <TextBlock Grid.Column="3" Text="QUANTIDADE" FontSize="12" FontWeight="Bold" Foreground="#53677A" />
+                                    <TextBlock Grid.Column="4" Text="AÇÕES" FontSize="12" FontWeight="Bold" Foreground="#53677A" />
+                                </Grid>
+                            </Border>
+                            <ItemsControl x:Name="ItensVendaControle">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="local:ItemVenda">
+                                        <Border Classes="item-row" BorderBrush="#E5ECEF" BorderThickness="0,0,0,1" Padding="16,14">
+                                            <Grid ColumnDefinitions="1.1*,2.2*,1.2*,1.1*,Auto">
+                                                <TextBlock Text="{Binding Codigo}" Foreground="#17324D" VerticalAlignment="Center" />
+                                                <TextBlock Grid.Column="1" Text="{Binding Nome}" Foreground="#17324D" VerticalAlignment="Center" />
+                                                <TextBlock Grid.Column="2" Text="{Binding TextoPreco}" Foreground="#17324D" VerticalAlignment="Center" />
+                                                <TextBlock Grid.Column="3" Text="{Binding Quantidade}" Foreground="#17324D" VerticalAlignment="Center" />
+                                                <Border Grid.Column="4" Classes="acao-menu" IsVisible="True" Opacity="1" HorizontalAlignment="Right" Background="#F3F6F9" CornerRadius="8" Padding="6,4">
+                                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                                        <Button Content="Editar" Classes="botao-link" Tag="{Binding}" Click="EditarBotao_Clicado" />
+                                                        <Button Content="Excluir" Classes="botao-excluir" Tag="{Binding}" Click="ExcluirBotao_Clicado" />
+                                                    </StackPanel>
+                                                </Border>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <TextBlock x:Name="MensagemListaVazia" Text="Nenhum produto adicionado ainda." Foreground="#71838F" HorizontalAlignment="Center" Margin="16" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+                <Border Background="White" CornerRadius="6" Padding="24" BorderBrush="#DCE5EA" BorderThickness="1">
+                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="28">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Resumo da venda" Classes="titulo-secao" />
+                            <TextBlock Text="O desconto é aplicado somente ao total final." Foreground="#6C7D89" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Spacing="6" Width="150">
+                            <TextBlock Text="Desconto (R$)" Classes="rotulo-campo" />
+                            <TextBox x:Name="DescontoCaixa" PlaceholderText="0,00" TextChanged="DescontoCaixa_TextoAlterado" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Spacing="4" HorizontalAlignment="Right">
+                            <TextBlock Text="Subtotal" Foreground="#6C7D89" />
+                            <TextBlock x:Name="SubtotalTexto" Text="R$ 0,00" FontSize="17" Foreground="#17324D" HorizontalAlignment="Right" />
+                            <TextBlock Text="Total" Foreground="#13795B" FontWeight="SemiBold" />
+                            <TextBlock x:Name="TotalTexto" Text="R$ 0,00" FontSize="24" FontWeight="Bold" Foreground="#13795B" HorizontalAlignment="Right" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Window>
