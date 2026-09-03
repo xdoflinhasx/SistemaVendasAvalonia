@@ -174,8 +174,8 @@ public partial class JanelaPrincipal : Window
 
         await using var comando = conexao.CreateCommand();
         comando.CommandText = """
-            IF OBJECT_ID(N'ItensVenda', N'U') IS NOT NULL
-               AND OBJECT_ID(N'__EFMigrationsHistory', N'U') IS NULL
+                IF OBJECT_ID(N'ItensVenda', N'U') IS NOT NULL
+                    AND OBJECT_ID(N'__EFMigrationsHistory', N'U') IS NULL
             BEGIN
                 CREATE TABLE [__EFMigrationsHistory]
                 (
@@ -184,6 +184,12 @@ public partial class JanelaPrincipal : Window
                     CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
                 );
 
+            END
+
+            IF OBJECT_ID(N'ItensVenda', N'U') IS NOT NULL
+               AND OBJECT_ID(N'__EFMigrationsHistory', N'U') IS NOT NULL
+               AND NOT EXISTS (SELECT 1 FROM [__EFMigrationsHistory])
+            BEGIN
                 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
                 VALUES (N'20260903224328_InitialCreate', N'10.0.11');
 
