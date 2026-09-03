@@ -18,7 +18,7 @@ public partial class JanelaPrincipal : Window
     public bool ListaVazia => Vendas.Count == 0;
     private int _indiceEdicao = -1;
     private readonly DispatcherTimer _temporizadorMensagem = new() { Interval = TimeSpan.FromSeconds(2) };
-    private readonly Task _inicializacaoBanco;
+    private readonly Task<bool> _inicializacaoBanco;
 
     public JanelaPrincipal()
     {
@@ -50,7 +50,8 @@ public partial class JanelaPrincipal : Window
             return;
         }
 
-        await _inicializacaoBanco;
+        if (!await _inicializacaoBanco)
+            return;
 
         await using var banco = new VendasDbContext();
         if (_indiceEdicao >= 0)
@@ -98,7 +99,8 @@ public partial class JanelaPrincipal : Window
         if (sender is not Button { Tag: ItemVenda item })
             return;
 
-        await _inicializacaoBanco;
+        if (!await _inicializacaoBanco)
+            return;
 
         await using var banco = new VendasDbContext();
         banco.ItensVenda.Remove(item);
@@ -143,7 +145,7 @@ public partial class JanelaPrincipal : Window
         QuantidadeCaixa.Text = string.Empty;
     }
 
-    private async Task InicializarBancoAsync()
+    private async Task<bool> InicializarBancoAsync()
     {
         try
         {
@@ -153,10 +155,13 @@ public partial class JanelaPrincipal : Window
             var itens = await banco.ItensVenda.AsNoTracking().OrderBy(item => item.Id).ToListAsync();
             foreach (var item in itens)
                 Vendas.Add(item);
+
+            return true;
         }
         catch (Exception exception)
         {
             MensagemStatus.Text = $"Não foi possível conectar ao banco: {exception.Message}";
+            return false;
         }
     }
 
