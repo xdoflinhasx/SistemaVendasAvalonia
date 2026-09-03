@@ -54,11 +54,13 @@ public partial class JanelaPrincipal : Window
             return;
 
         await using var banco = new VendasDbContext();
+        var indiceEdicao = _indiceEdicao;
+        ItemVenda? itemEditado = null;
         if (_indiceEdicao >= 0)
         {
-            var item = Vendas[_indiceEdicao];
-            item.Atualizar(codigo, nome, preco, quantidade);
-            banco.ItensVenda.Update(item);
+            itemEditado = Vendas[_indiceEdicao];
+            itemEditado.Atualizar(codigo, nome, preco, quantidade);
+            banco.ItensVenda.Update(itemEditado);
         }
         else
         {
@@ -67,6 +69,9 @@ public partial class JanelaPrincipal : Window
             await banco.ItensVenda.AddAsync(item);
         }
         await banco.SaveChangesAsync();
+
+        if (itemEditado is not null)
+            Vendas[indiceEdicao] = itemEditado;
 
         MensagemListaVazia.IsVisible = false;
         MensagemStatus.Text = string.Empty;
