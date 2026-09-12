@@ -392,4 +392,3 @@ public partial class JanelaPrincipal : Window
 
     public new event PropertyChangedEventHandler? PropertyChanged;
 }
-
