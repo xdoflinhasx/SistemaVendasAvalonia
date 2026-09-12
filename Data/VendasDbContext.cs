@@ -6,6 +6,11 @@ namespace MeuAppAvalonia;
 public sealed class VendasDbContext : DbContext
 {
     public DbSet<ItemVenda> ItensVenda => Set<ItemVenda>();
+    public DbSet<Venda> Vendas => Set<Venda>();
+    public DbSet<Cliente> Clientes => Set<Cliente>();
+    public DbSet<Vendedor> Vendedores => Set<Vendedor>();
+    public DbSet<Produto> Produtos => Set<Produto>();
+    public DbSet<ConfiguracaoSecret> ConfiguracoesSecret => Set<ConfiguracaoSecret>();
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -28,6 +33,55 @@ public sealed class VendasDbContext : DbContext
             entity.Property(item => item.Preco).HasPrecision(18, 2);
             entity.Ignore(item => item.TextoPreco);
             entity.Ignore(item => item.Total);
+        });
+
+        modelBuilder.Entity<Venda>(entity =>
+        {
+            entity.HasKey(venda => venda.Id);
+            entity.Property(venda => venda.Cliente).HasMaxLength(200).IsRequired();
+            entity.Property(venda => venda.Vendedor).HasMaxLength(200).IsRequired();
+            entity.Property(venda => venda.FormaPagamento).HasMaxLength(100).IsRequired();
+            entity.Property(venda => venda.Desconto).HasPrecision(18, 2);
+            entity.HasMany(venda => venda.Itens)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<Cliente>(entity =>
+        {
+            entity.HasKey(cliente => cliente.Id);
+            entity.Property(cliente => cliente.Nome).HasMaxLength(200).IsRequired();
+            entity.Property(cliente => cliente.Documento).HasMaxLength(50).IsRequired();
+        });
+
+        modelBuilder.Entity<Vendedor>(entity =>
+        {
+            entity.HasKey(vendedor => vendedor.Id);
+            entity.Property(vendedor => vendedor.Nome).HasMaxLength(200).IsRequired();
+            entity.Property(vendedor => vendedor.Codigo).HasMaxLength(50).IsRequired();
+        });
+
+        modelBuilder.Entity<Produto>(entity =>
+        {
+            entity.HasKey(produto => produto.Id);
+            entity.Property(produto => produto.Codigo).HasMaxLength(50).IsRequired();
+            entity.Property(produto => produto.Nome).HasMaxLength(200).IsRequired();
+            entity.Property(produto => produto.Preco).HasPrecision(18, 2);
+        });
+
+        modelBuilder.Entity<ConfiguracaoSecret>(entity =>
+        {
+            entity.ToTable("Configuracao");
+            entity.HasKey(config => config.Id);
+            entity.Property(config => config.ClientId).HasMaxLength(200).IsRequired();
+            entity.Property(config => config.EmpresaNome).HasMaxLength(200).IsRequired();
+            entity.Property(config => config.EmpresaCnpj).HasMaxLength(30).IsRequired();
+            entity.Property(config => config.DeviceName).HasMaxLength(200).IsRequired();
+            entity.Property(config => config.SecretGerado).HasMaxLength(300).IsRequired();
+            entity.Property(config => config.UrlEndpoint).HasMaxLength(1000).IsRequired();
+            entity.Property(config => config.TokenAcesso).HasMaxLength(500).IsRequired();
+            entity.Property(config => config.TokenExpiraEm).IsRequired();
+            entity.Property(config => config.DataAtualizacao).IsRequired();
         });
     }
 }
