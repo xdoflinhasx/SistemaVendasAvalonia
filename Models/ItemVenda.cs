@@ -6,6 +6,8 @@ namespace MeuAppAvalonia;
 public sealed class ItemVenda : INotifyPropertyChanged
 {
     public int Id { get; private set; }
+    public int? VendaId { get; set; }
+    public Venda? Venda { get; set; }
     public string Codigo { get; private set; } = string.Empty;
     public string Nome { get; private set; } = string.Empty;
     public decimal Preco { get; private set; }

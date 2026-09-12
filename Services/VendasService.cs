@@ -50,8 +50,26 @@ public sealed class VendasService
 
         if (vendaExistente is null)
         {
-            venda.Itens = itens.ToList();
-            await banco.Vendas.AddAsync(venda);
+            var novaVenda = new Venda
+            {
+                Cliente = venda.Cliente,
+                Vendedor = venda.Vendedor,
+                FormaPagamento = venda.FormaPagamento,
+                Desconto = venda.Desconto,
+                Itens = new List<ItemVenda>()
+            };
+
+            foreach (var item in itens)
+            {
+                var itemPersistido = new ItemVenda(item.Codigo, item.Nome, item.Preco, item.Quantidade)
+                {
+                    Venda = novaVenda,
+                    VendaId = null
+                };
+                novaVenda.Itens.Add(itemPersistido);
+            }
+
+            await banco.Vendas.AddAsync(novaVenda);
         }
         else
         {
@@ -61,7 +79,18 @@ public sealed class VendasService
             vendaExistente.Desconto = venda.Desconto;
 
             banco.ItensVenda.RemoveRange(vendaExistente.Itens);
-            vendaExistente.Itens = itens.ToList();
+            vendaExistente.Itens = new List<ItemVenda>();
+
+            foreach (var item in itens)
+            {
+                var itemPersistido = new ItemVenda(item.Codigo, item.Nome, item.Preco, item.Quantidade)
+                {
+                    Venda = vendaExistente,
+                    VendaId = vendaExistente.Id
+                };
+                vendaExistente.Itens.Add(itemPersistido);
+            }
+
             banco.Vendas.Update(vendaExistente);
         }
 

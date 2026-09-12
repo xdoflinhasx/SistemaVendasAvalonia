@@ -63,13 +63,16 @@ public partial class JanelaPrincipal : Window
             NotificarAlteracao(nameof(ListaVazia));
         };
 
-        CriarNovaVendaEmMemoria();
+        PrepararTelaNovaVenda();
         AtualizarTotais();
     }
 
     private void NovaVendaBotao_Clicado(object? sender, RoutedEventArgs e)
     {
+        _historicoVendas.Clear();
+        _indiceRegistroAtual = -1;
         CriarNovaVendaEmMemoria();
+        PrepararTelaNovaVenda();
         MensagemStatus.Text = "Nova venda criada em memória.";
     }
 
@@ -92,17 +95,7 @@ public partial class JanelaPrincipal : Window
             return;
         }
 
-        ClienteCaixa.Text = string.Empty;
-        VendedorCaixa.Text = string.Empty;
-        FormaPagamentoComboBox.SelectedIndex = 0;
-        DescontoCaixa.Text = string.Empty;
-        Vendas.Clear();
-        VendaAtual.Cliente = string.Empty;
-        VendaAtual.Vendedor = string.Empty;
-        VendaAtual.FormaPagamento = "Dinheiro";
-        VendaAtual.Desconto = 0m;
-        VendaAtual.Itens.Clear();
-        LimparFormularioItem();
+        PrepararTelaNovaVenda();
         MensagemStatus.Text = "Venda cancelada. O estado da tela foi limpo.";
         AtualizarTotais();
     }
@@ -131,8 +124,11 @@ public partial class JanelaPrincipal : Window
     {
         var venda = VendaAtual ?? CriarNovaVendaEmMemoria();
 
-        venda.Cliente = (ClienteCaixa.Text ?? string.Empty).Trim();
-        venda.Vendedor = (VendedorCaixa.Text ?? string.Empty).Trim();
+        var clienteSelecionado = ClienteCaixa.SelectedItem as Cliente;
+        var vendedorSelecionado = VendedorCaixa.SelectedItem as Vendedor;
+
+        venda.Cliente = clienteSelecionado?.Nome ?? (ClienteCaixa.Text ?? string.Empty).Trim();
+        venda.Vendedor = vendedorSelecionado?.Nome ?? (VendedorCaixa.Text ?? string.Empty).Trim();
         venda.FormaPagamento = FormaPagamentoComboBox.SelectedItem as string ?? "Dinheiro";
         venda.Desconto = decimal.TryParse(DescontoCaixa.Text, NumberStyles.Currency, CultureInfo.CurrentCulture, out var desconto)
             ? desconto
@@ -141,9 +137,31 @@ public partial class JanelaPrincipal : Window
         foreach (var item in Vendas)
             venda.Itens.Add(item);
 
+        if (string.IsNullOrWhiteSpace(venda.Cliente) || string.IsNullOrWhiteSpace(venda.Vendedor))
+        {
+            MensagemStatus.Text = "Selecione um cliente e um vendedor antes de salvar a venda.";
+            return;
+        }
+
+        if (venda.Itens.Count == 0)
+        {
+            MensagemStatus.Text = "Adicione pelo menos um item antes de salvar a venda.";
+            return;
+        }
+
         await PersistirVendaAsync(venda);
 
-        MensagemStatus.Text = "Venda salva com sucesso no banco de dados.";
+        if (VendaAtual is not null)
+        {
+            VendaAtual.Cliente = string.Empty;
+            VendaAtual.Vendedor = string.Empty;
+            VendaAtual.FormaPagamento = "Dinheiro";
+            VendaAtual.Desconto = 0m;
+            VendaAtual.Itens.Clear();
+        }
+
+        PrepararTelaNovaVenda();
+        MensagemStatus.Text = "Venda salva com sucesso! Próxima venda pronta para cadastro.";
     }
 
     private void CodigoProdutoCaixa_SelectionChanged(object? sender, SelectionChangedEventArgs e)
@@ -278,6 +296,23 @@ public partial class JanelaPrincipal : Window
         QuantidadeCaixa.Text = string.Empty;
     }
 
+    private void PrepararTelaNovaVenda()
+    {
+        ClienteCaixa.SelectedIndex = -1;
+        ClienteCaixa.Text = string.Empty;
+
+        VendedorCaixa.SelectedIndex = -1;
+        VendedorCaixa.Text = string.Empty;
+
+        FormaPagamentoComboBox.SelectedIndex = 0;
+        DescontoCaixa.Text = string.Empty;
+
+        Vendas.Clear();
+        LimparFormularioItem();
+        MensagemListaVazia.IsVisible = true;
+        AtualizarTotais();
+    }
+
     private async Task CarregarDadosBaseAsync()
     {
         try
@@ -300,14 +335,9 @@ public partial class JanelaPrincipal : Window
             foreach (var produto in produtos)
                 ProdutosDisponiveis.Add(produto);
 
-            if (ClientesDisponiveis.Count > 0)
-                ClienteCaixa.SelectedItem = ClientesDisponiveis[0];
-
-            if (VendedoresDisponiveis.Count > 0)
-                VendedorCaixa.SelectedItem = VendedoresDisponiveis[0];
-
-            if (ProdutosDisponiveis.Count > 0)
-                CodigoProdutoCaixa.SelectedIndex = 0;
+            ClienteCaixa.SelectedIndex = -1;
+            VendedorCaixa.SelectedIndex = -1;
+            CodigoProdutoCaixa.SelectedIndex = -1;
         }
         catch
         {

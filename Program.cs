@@ -1,22 +1,21 @@
-﻿using Avalonia;
 using System;
+using Avalonia;
 
 namespace MeuAppAvalonia;
 
-class Programa
+internal static class Program
 {
-    // O código de inicialização deve ser executado somente após o Avalonia estar pronto.
     [STAThread]
-    public static void Main(string[] args) => BuildAvaloniaApp()
-        .StartWithClassicDesktopLifetime(args);
+    public static void Main(string[] args)
+    {
+        BuildAvaloniaApp()
+            .StartWithClassicDesktopLifetime(args);
+    }
 
-    // Configuração do Avalonia, também usada pelo designer visual.
     public static AppBuilder BuildAvaloniaApp()
-        => AppBuilder.Configure<Aplicacao>()
+    {
+        return AppBuilder.Configure<Aplicacao>()
             .UsePlatformDetect()
-#if DEBUG
-            .WithDeveloperTools()
-#endif
-            .WithInterFont()
             .LogToTrace();
+    }
 }

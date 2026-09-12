@@ -31,8 +31,13 @@ public sealed class VendasDbContext : DbContext
             entity.Property(item => item.Codigo).HasMaxLength(50).IsRequired();
             entity.Property(item => item.Nome).HasMaxLength(200).IsRequired();
             entity.Property(item => item.Preco).HasPrecision(18, 2);
+            entity.Property(item => item.VendaId);
             entity.Ignore(item => item.TextoPreco);
             entity.Ignore(item => item.Total);
+            entity.HasOne(item => item.Venda)
+                .WithMany(venda => venda.Itens)
+                .HasForeignKey(item => item.VendaId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<Venda>(entity =>
@@ -43,7 +48,8 @@ public sealed class VendasDbContext : DbContext
             entity.Property(venda => venda.FormaPagamento).HasMaxLength(100).IsRequired();
             entity.Property(venda => venda.Desconto).HasPrecision(18, 2);
             entity.HasMany(venda => venda.Itens)
-                .WithOne()
+                .WithOne(item => item.Venda)
+                .HasForeignKey(item => item.VendaId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
 

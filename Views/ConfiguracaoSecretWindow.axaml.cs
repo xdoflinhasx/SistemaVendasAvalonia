@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Net.Http;
+using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -157,12 +158,20 @@ public partial class ConfiguracaoSecretWindow : Window
         MensagemStatus.Foreground = Brushes.Green;
     }
 
+    [SupportedOSPlatform("windows")]
     private async void CopiarTokenButton_Click(object? sender, RoutedEventArgs e)
     {
         var token = TokenAcessoTextBox.Text?.Trim();
         if (string.IsNullOrWhiteSpace(token))
         {
             MensagemStatus.Text = "Gere primeiro o token de autenticação antes de copiar.";
+            MensagemStatus.Foreground = Brushes.Orange;
+            return;
+        }
+
+        if (!OperatingSystem.IsWindows())
+        {
+            MensagemStatus.Text = "A cópia do token está disponível apenas no Windows.";
             MensagemStatus.Foreground = Brushes.Orange;
             return;
         }
